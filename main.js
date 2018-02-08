@@ -30,7 +30,7 @@ app.use((req, res, next) => {
   // 実際の開発ではミドルウェアでセッションクリアは行わない
   // cronなどで処理するかフレークワークに乗っかる
   // 今回はあくまでサンプルなので簡単のためにここに書いている
-  execSync(`find ./session/* -name "*.txt" -mmin +5 | xargs rm -f`)
+  execSync(`find ./session -name "*.txt" -mmin +5 | xargs rm -f`)
   next()
 })
 
