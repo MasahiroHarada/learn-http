@@ -3,6 +3,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const uuid = require('uuid/v4')
+const execSync = require('child_process').execSync
 
 // =====================================
 // 初期設定
@@ -22,6 +23,17 @@ app.set('view engine', 'ejs')
 // クッキーに使うキー名
 const SESSID_COOKIE_KEYNAME = 'LEARNING_HTTP_SESSID'
 
+// app.use(***)はミドルウェア登録
+// useの引数の関数がリクエストのたびに呼ばれる
+app.use((req, res, next) => {
+  // セッションファイルが貯まらないように古いファイルを削除する
+  // 実際の開発ではミドルウェアでセッションクリアは行わない
+  // cronなどで処理するかフレークワークに乗っかる
+  // 今回はあくまでサンプルなので簡単のためにここに書いている
+  execSync(`find ./session/* -name "*.txt" -mmin +5 | xargs rm -f`)
+  next()
+})
+
 // =====================================
 // ルーティング
 // =====================================
@@ -34,9 +46,9 @@ app.get('/', (req, res) => {
 
   // Cookieが存在するか
   const sessionId = req.cookies[SESSID_COOKIE_KEYNAME]
-  if (sessionId && fs.existsSync(`./session/${sessionId}`)) {
+  if (sessionId && fs.existsSync(`./session/${sessionId}.txt`)) {
     // セッションファイルの内容を読み取る
-    name = fs.readFileSync(`./session/${sessionId}`, 'utf8')
+    name = fs.readFileSync(`./session/${sessionId}.txt`, 'utf8')
   }
 
   res.render('index', { name })
@@ -51,11 +63,16 @@ app.post('/', (req, res) => {
 
   // セッションに保存する
   const sessionId = uuid()
-  fs.writeFileSync(`./session/${sessionId}`, name)
+  fs.writeFileSync(`./session/${sessionId}.txt`, name)
 
   // Cookieをセット
-  const hourInMilliseconds = 60 * 60 * 1000 // 1時間のミリ秒数
-  res.cookie(SESSID_COOKIE_KEYNAME, sessionId, { maxAge: hourInMilliseconds })
+  const options = {
+    path: '/',
+    httpOnly: true,
+    secure: false,
+    maxAge: 5 * 60 * 1000 // 5分のミリ秒数
+  }
+  res.cookie(SESSID_COOKIE_KEYNAME, sessionId, options)
 
   // トップ画面にリダイレクト
   res.redirect('/')
