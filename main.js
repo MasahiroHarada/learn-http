@@ -23,17 +23,6 @@ app.set('view engine', 'ejs')
 // クッキーに使うキー名
 const SESSID_COOKIE_KEYNAME = 'LEARNING_HTTP_SESSID'
 
-// app.use(***)はミドルウェア登録
-// useの引数の関数がリクエストのたびに呼ばれる
-app.use((req, res, next) => {
-  // セッションファイルが貯まらないように古いファイルを削除する
-  // 実際の開発ではミドルウェアでセッションクリアは行わない
-  // cronなどで処理するかフレークワークに乗っかる
-  // 今回はあくまでサンプルなので簡単のためにここに書いている
-  execSync(`find ./session -name "*.txt" -mmin +5 | xargs rm -f`)
-  next()
-})
-
 // =====================================
 // ルーティング
 // =====================================
@@ -45,12 +34,16 @@ app.get('/', (req, res) => {
   let name = null
 
   // Cookieが存在するか
-  const sessionId = req.cookies[SESSID_COOKIE_KEYNAME]
+  console.log(req.headers.cookie)
+  const regex = new RegExp(`${SESSID_COOKIE_KEYNAME}=([^;]+)`)
+  const match = regex.exec(req.headers.cookie)
+  const sessionId = match ? match[1] : null
   if (sessionId && fs.existsSync(`./session/${sessionId}.txt`)) {
     // セッションファイルの内容を読み取る
     name = fs.readFileSync(`./session/${sessionId}.txt`, 'utf8')
   }
 
+  res.setHeader("Content-Type", "text/html; charset=utf-8")
   res.render('index', { name })
 })
 
@@ -66,16 +59,40 @@ app.post('/', (req, res) => {
   fs.writeFileSync(`./session/${sessionId}.txt`, name)
 
   // Cookieをセット
-  const options = {
-    path: '/',
-    httpOnly: true,
-    secure: false,
-    maxAge: 5 * 60 * 1000 // 5分のミリ秒数
-  }
-  res.cookie(SESSID_COOKIE_KEYNAME, sessionId, options)
+  res.setHeader('Set-Cookie', [
+    `${SESSID_COOKIE_KEYNAME}=${sessionId}; Path=/; Max-Age=180; HttpOnly`,
+    `foo=bar; Path=/; Max-Age=180; HttpOnly`
+  ])
 
   // トップ画面にリダイレクト
-  res.redirect('/')
+  res.statusCode = 302
+  res.setHeader('Location', '/')
+  res.end()
+})
+
+/**
+ * ログアウト
+ */
+app.post('/logout', (req, res) => {
+  // Cookieが存在するか
+  const regex = new RegExp(`${SESSID_COOKIE_KEYNAME}=([^;]+)`)
+  const match = regex.exec(req.headers.cookie)
+  const sessionId = match ? match[1] : null
+  if (sessionId && fs.existsSync(`./session/${sessionId}.txt`)) {
+    // セッションファイルを削除する
+    fs.unlinkSync(`./session/${sessionId}.txt`)
+  }
+
+  // Cookieをセット
+  // Max-Ageをゼロに設定することで削除される
+  res.setHeader('Set-Cookie', [
+    `${SESSID_COOKIE_KEYNAME}=${sessionId}; Path=/; Max-Age=0; HttpOnly`
+  ])
+
+  // トップ画面にリダイレクト
+  res.statusCode = 302
+  res.setHeader('Location', '/')
+  res.end()
 })
 
 // =====================================

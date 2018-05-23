@@ -1,51 +1,68 @@
-@import url('https://fonts.googleapis.com/css?family=Varela+Round');
+@import url('https://fonts.googleapis.com/css?family=Karla');
 
 html {
   font-size: 18px;
 }
 
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
 body {
-  font-family: 'Varela Round', sans-serif;
+  align-items: center;
+  font-family: Karla, sans-serif;
+  display: flex;
+  min-height: 100vh;
 }
 
 main {
+  flex: 1 1 auto;
+}
+
+.container {
   margin: 0 auto;
   max-width: 480px;
-  padding: 2rem 2%;
 }
 
 h1 {
-  font-size: 1.8rem;
-  margin-bottom: 2rem;
-}
-
-label {
-  display: block;
-  margin-bottom: .75rem;
+  font-size: 1.6rem;
+  margin-bottom: 1.5rem;
 }
 
 input {
   border: 1px solid #dedede;
   border-radius: 4px;
+  font-family: inherit;
   font-size: 1rem;
-  margin-bottom: .75rem;
+  margin-bottom: 1rem;
   padding: .5rem .75rem;
   width: 100%;
 }
 
 button {
-  background: #0DD98A;
   border: 0;
   border-radius: 4px;
-  color: white;
   cursor: pointer;
   font-family: inherit;
   font-size: 1rem;
-  padding: .25rem .75rem;
+  padding: .5rem .75rem;
+}
+
+button.login {
+  background: #2070FF;
+  color: white;
+}
+
+button.logout {
+  background: #ccc;
+  color: inherit;
 }
 
 img {
   border-radius: 4px;
+  margin-bottom: 1rem;
   width: 100%;
 }
 

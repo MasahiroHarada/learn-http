@@ -5,23 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Learning HTTP</title>
-  <link rel="stylesheet" href="/css/minireset.css">
   <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
   <main>
-    <% if (name === null) { %>
-      <form action="/" method="post">
-        <label for="name">What is your name?</label>
-        <input type="text" id="name" name="name">
-        <p class="text-right">
-          <button type="submit">submit</button>
-        </p>
-      </form>
-    <% } else { %>
-      <h1>Hello, <%= name %></h1>
-      <img src="/img/cat.gif" alt="Cat GIF">
-    <% } %>
+    <div class="container">
+      <% if (name === null) { %>
+        <h1>What is your name?</h1>
+        <form action="/" method="post">
+          <input type="text" id="name" name="name">
+          <p class="text-right">
+            <button class="login" type="submit">submit</button>
+          </p>
+        </form>
+      <% } else { %>
+        <h1>Hello, <%= name %></h1>
+        <img src="/img/cat.gif" alt="Cat GIF">
+        <form action="/logout" method="post">
+          <p class="text-right">
+            <button class="logout" type="submit">logout</button>
+          </p>
+        </form>
+      <% } %>
+    </div>
   </main>
 </body>
 </html>
