@@ -1,5 +1,7 @@
-# 「HTTPを覗いてみよう」サンプルアプリケーション
+# HTTP学習用サンプルアプリケーション
 
-このアプリケーションは以下の資料内で利用されます。
+## 起動スクリプト
 
-https://www.gitbook.com/book/masahiroharada/dip-into-http/details
+```
+$ npm run start
+```
