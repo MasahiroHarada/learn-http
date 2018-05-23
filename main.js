@@ -65,7 +65,7 @@ app.post('/', (req, res) => {
   ])
 
   // トップ画面にリダイレクト
-  res.statusCode = 302
+  res.statusCode = 303
   res.setHeader('Location', '/')
   res.end()
 })
@@ -90,7 +90,7 @@ app.post('/logout', (req, res) => {
   ])
 
   // トップ画面にリダイレクト
-  res.statusCode = 302
+  res.statusCode = 303
   res.setHeader('Location', '/')
   res.end()
 })
